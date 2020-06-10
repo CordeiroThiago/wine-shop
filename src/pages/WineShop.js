@@ -4,6 +4,7 @@ import WineItem from '../components/WineItem'
 import WineCartItem from '../components/WineCartItem'
 import CartFooter from '../components/CartFooter'
 import floatToMoney from '../functions/FloatToMoney'
+import { toast } from "react-toastify";
 
 const axios = require('axios');
 
@@ -18,6 +19,7 @@ class WineShop extends Component {
 
         this.getInCart = this.getInCart.bind(this);
         this.addToCart = this.addToCart.bind(this);
+        this.cleanCart = this.cleanCart.bind(this);
         this.removeFromCart = this.removeFromCart.bind(this);
         this.addWineQuantity = this.addWineQuantity.bind(this);
         this.removeWineQuantity = this.removeWineQuantity.bind(this);
@@ -27,27 +29,36 @@ class WineShop extends Component {
         this.getWines();
     }
 
+    componentWillUnmount() {
+        toast.dismiss();
+    }
+
     getWines() {
         axios.get('http://localhost/wine-shop-api/wines')
         .then(response => {
             const wines = [];
-            console.log(response.data[0])
-            response.data.map(wine =>
-                wines.push(
-                    {
-                        wine_id: wine.wine_id,
-                        name: wine.name,
-                        wine_type_id: wine.wine_type_id,
-                        type: wine.type,
-                        weight: wine.weight.toString().replace(".", ",") + " kg",
-                        price: "R$ " + floatToMoney(wine.price)
-                    }
+            
+            if (response.data.message) {
+                toast.info(response.data.message, {autoClose: 5000});
+            } else {
+                response.data.map(wine =>
+                    wines.push(
+                        {
+                            wine_id: wine.wine_id,
+                            name: wine.name,
+                            wine_type_id: wine.wine_type_id,
+                            type: wine.type,
+                            weight: wine.weight.toString().replace(".", ",") + " kg",
+                            price: "R$ " + floatToMoney(wine.price)
+                        }
+                    )
                 )
-            )
-            this.setState({wines: wines});
+                this.setState({wines: wines});
+            }
         })
         .catch(error => {
             console.log(error);
+            toast.error("Ocorreu um erro de comunicação com o servidor");
         });
     }
 
@@ -56,19 +67,23 @@ class WineShop extends Component {
     }
 
     addToCart(wine) {
-        const cart = [...this.state.winesChoosed];
+        const cart = JSON.parse(JSON.stringify(this.state.winesChoosed));
         wine.quantity = 1;
         cart.push(wine);
         this.setState({winesChoosed: cart});
     }
 
+    cleanCart() {
+        this.setState({winesChoosed: []});
+    }
+
     removeFromCart(wine) {
-        const cart = [...this.state.winesChoosed];
+        const cart = JSON.parse(JSON.stringify(this.state.winesChoosed));
         this.setState({winesChoosed: cart.filter(item => item.wine_id !== wine.wine_id)});
     }
 
     addWineQuantity(wine) {
-        const cart = [...this.state.winesChoosed];
+        const cart = JSON.parse(JSON.stringify(this.state.winesChoosed));
         cart.map(item => {
             if (item.wine_id === wine.wine_id) {
                 item.quantity++;
@@ -83,7 +98,7 @@ class WineShop extends Component {
             return;
         }
 
-        const cart = [...this.state.winesChoosed];
+        const cart = JSON.parse(JSON.stringify(this.state.winesChoosed));
         cart.map(item => {
             if (item.wine_id === wine.wine_id) {
                 item.quantity--;
@@ -112,7 +127,7 @@ class WineShop extends Component {
                             remove={this.removeWineQuantity}
                         />
                     )}
-                    <CartFooter wines={this.state.winesChoosed} />
+                    <CartFooter cleanCart={this.cleanCart} wines={this.state.winesChoosed} />
                 </div>
             </div>
         );

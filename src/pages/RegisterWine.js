@@ -1,5 +1,6 @@
 import React, { Component } from "react";
 import './styles/RegisterWine.scss'
+import { toast } from 'react-toastify';
 
 const axios = require('axios').default;
 
@@ -31,6 +32,10 @@ class RegisterWine extends Component {
 
     componentDidMount() {
         this.getTypes();
+    }
+
+    componentWillUnmount() {
+        toast.dismiss();
     }
 
     shouldComponentUpdate(nextProps, nextState) {
@@ -75,26 +80,30 @@ class RegisterWine extends Component {
         axios.get(`http://localhost/wine-shop-api/wine-types`)
         .then(response => {
             const types = [];
-            response.data.forEach(type => {
-                types.push(type)
-            });
-            this.setState({selectTypeValues: types});
-
+            if (response.data.message) {
+                toast.info(response.data.message, {autoClose: 5000});
+            } else {
+                response.data.forEach(type => {
+                    types.push(type)
+                });
+                this.setState({selectTypeValues: types});
+            }
             if (types.length > 0) {
                 this.setState({selectedtype: types[0].wine_type_id});
             }
         })
         .catch(error => {
             console.log(error);
+            toast.error("Ocorreu um erro de comunicação com o servidor");
         });
     }
 
     handleAddNewType() {
-        this.setState({display: "block"})
+        this.setState({display: "block", newType: ""})
     }
 
     handleCloseModal() {
-        this.setState({display: "none"})
+        this.setState({display: "none", newType: ""})
     }
 
     handleTypeNameChange(event) {
@@ -109,9 +118,13 @@ class RegisterWine extends Component {
         axios.post(`http://localhost/wine-shop-api/wine-types`, data)
         .then(() => {
             this.getTypes();
+            toast.success("Cadastrado tipo de vinho: " + this.state.newType);
+
+            this.setState({newType: ""});
         })
         .catch(error => {
             console.log(error);
+            toast.error("Ocorreu um erro de comunicação com o servidor");
         });
     }
 
@@ -124,12 +137,14 @@ class RegisterWine extends Component {
         }
 
         axios.post(`http://localhost/wine-shop-api/wines`, data)
-        .then(response => {
-            // TODO: Mostrar venda concluída
-            console.log(response.data);
+        .then(() => {
+            toast.success("Cadastrado o vinho: " + this.state.name);
+
+            this.getTypes();
         })
         .catch(error => {
             console.log(error);
+            toast.error("Ocorreu um erro de comunicação com o servidor");
         });
     }
 

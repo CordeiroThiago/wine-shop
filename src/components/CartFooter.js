@@ -1,5 +1,6 @@
 import React, { Component } from "react";
 import floatToMoney from '../functions/FloatToMoney'
+import { toast } from "react-toastify";
 
 const axios = require('axios').default;
 
@@ -19,8 +20,16 @@ class CartFooter extends Component {
         this.handleSale = this.handleSale.bind(this);
     }
 
+    componentDidMount() {
+        this.getValues();
+    }
+
+    componentDidUpdate() {
+        this.getValues();
+    }
+
     shouldComponentUpdate(nextProps, nextState) {
-        if (this.props.wines !== nextProps.wines) {
+        if (JSON.stringify(this.props.wines) !== JSON.stringify(nextProps.wines)) {
             return true;
         }
         if (this.state.totalItems !== nextState.totalItems) {
@@ -39,7 +48,14 @@ class CartFooter extends Component {
     }
 
     getValues() {
-        if (this.props.wines.length === 0) return;
+        if (this.props.wines.length === 0) {
+            this.setState({
+                totalItems: 0,
+                shipping: 0,
+                total: 0
+            })
+            return;
+        };
         
         const wines = [];
         this.props.wines.map(wine => {
@@ -48,7 +64,6 @@ class CartFooter extends Component {
 
         axios.get(`http://localhost/wine-shop-api/calculate-total?distance=${this.state.distance}&wines=${wines.join(",")}`)
         .then(response => {
-            console.log(response.data);
             this.setState({
                 totalItems: response.data.totalItems,
                 shipping: response.data.shipping,
@@ -57,6 +72,7 @@ class CartFooter extends Component {
         })
         .catch(error => {
             console.log(error);
+            toast.error("Ocorreu um erro de comunicação com o servidor");
         });
     }
 
@@ -76,21 +92,19 @@ class CartFooter extends Component {
             distance: this.state.distance,
             wines: wines
         }
-        console.log(data);
 
         axios.post(`http://localhost/wine-shop-api/sales`, data)
         .then(response => {
-            // TODO: Mostrar venda concluída
-            console.log(response.data);
+            toast.success("Registrada a venda no valor de R$ " + floatToMoney(response.data.final_price));
+            this.props.cleanCart();
         })
         .catch(error => {
             console.log(error);
+            toast.error("Ocorreu um erro de comunicação com o servidor");
         });
     }
 
     render() {
-        this.getValues();
-
         return (
             <div className="cart-footer">
                 <div className="total title">
