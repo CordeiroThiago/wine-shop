@@ -1,0 +1,87 @@
+.shop-container {
+    margin: 1vh;
+    display: flex;
+
+    .cart {
+        flex-grow: 1;
+
+        .cart-footer {
+            display: flex;
+            margin: 2vh;
+            flex-direction: column;
+
+            .total {
+                display: flex;
+                justify-content: space-between;
+            }
+
+            .title {
+                color: grey;
+            }
+
+            .info {
+                margin-top: 1vh;
+            }
+
+            .total-final {
+                margin-top: 1vh;
+                border-top: 1px solid lightgrey;
+                font-size: x-large;
+            }
+        }
+    }
+
+    .wine-stock {
+        flex-grow: 2;
+    }
+}
+
+.item-container {
+    display: flex;
+    color: black;
+    font-size: medium;
+
+    .item-info {
+        display: flex;
+        flex-direction: column;
+        flex-grow: 3;
+        align-items: stretch;
+
+        .title {
+            font-size: small;
+            color: grey;
+        }
+
+        button {
+            align-self: flex-end;
+            width: 150px;
+            height: 100%;
+            border-radius: 15px;
+            border: none;
+        }
+
+        .add {
+            color: white;
+            background: #52b54a;
+            font-size: large;
+            width: 25px;
+            height: 25px;
+            align-self: center;
+        }
+
+        .remove {
+            color: white;
+            background: #d43b4b;
+            font-size: large;
+            width: 25px;
+            height: 25px;
+            align-self: center;
+        }
+    }
+
+    .item-info.horizontal {
+        flex-direction: row;
+        align-items: center;
+        justify-content: space-around;
+    }
+}
