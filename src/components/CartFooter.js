@@ -112,7 +112,7 @@ class CartFooter extends Component {
                     <div>R$ {floatToMoney(this.state.totalItems)}</div>
                 </div>
                 <div className="total info">
-                    <div>Distancia</div>
+                    <div>Distância</div>
                     <div>
                         <input type="number" className="input" value={this.state.distance} onChange={this.handleDistanceChange} /> Km
                     </div>

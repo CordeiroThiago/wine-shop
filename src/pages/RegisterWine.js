@@ -146,15 +146,13 @@ class RegisterWine extends Component {
                         <div className="field">
                             Tipo:
                         </div>
-                        <div className="value">
-                            <div>
-                                <select className="input" onChange={this.handleTypeChange}>
-                                    {this.state.selectTypeValues.map((type, key) => 
-                                        <option key={key} value={type.wine_type_id}>{type.type}</option>
-                                    )}
-                                </select>
-                                <button className="add-item" onClick={this.handleAddNewType}>+</button>
-                            </div>
+                        <div className="value" style={{display: "flex"}}>
+                            <select className="input" onChange={this.handleTypeChange}>
+                                {this.state.selectTypeValues.map((type, key) => 
+                                    <option key={key} value={type.wine_type_id}>{type.type}</option>
+                                )}
+                            </select>
+                            <button className="add-item" onClick={this.handleAddNewType}>+</button>
                         </div>
                     </div>
                     <div className="grid-item">
