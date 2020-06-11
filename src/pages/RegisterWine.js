@@ -1,6 +1,7 @@
 import React, { Component } from "react";
 import './styles/RegisterWine.scss'
 import { toast } from 'react-toastify';
+import ModalWineType from '../components/ModalWineType';
 
 const axios = require('axios').default;
 
@@ -14,8 +15,7 @@ class RegisterWine extends Component {
             name: "",
             weight: 0,
             price: 0,
-            display: "none",
-            newType: ""
+            display: "none"
         }
 
         this.handleNameChange = this.handleNameChange.bind(this);
@@ -23,10 +23,8 @@ class RegisterWine extends Component {
         this.handleWeightChange = this.handleWeightChange.bind(this);
         this.handlePriceChange = this.handlePriceChange.bind(this);
         this.getTypes = this.getTypes.bind(this);
-        this.handleTypeNameChange = this.handleTypeNameChange.bind(this);
         this.handleAddNewType = this.handleAddNewType.bind(this);
         this.handleCloseModal = this.handleCloseModal.bind(this);
-        this.handleSaveNewType = this.handleSaveNewType.bind(this);
         this.handleAddWine = this.handleAddWine.bind(this);
     }
 
@@ -54,7 +52,7 @@ class RegisterWine extends Component {
         if (this.state.display !== nextState.display) {
             return true;
         }
-        if (this.state.newType !== nextState.newType) {
+        if (this.state.selectedtype !== nextState.selectedtype) {
             return true;
         }
         return false;
@@ -99,33 +97,12 @@ class RegisterWine extends Component {
     }
 
     handleAddNewType() {
-        this.setState({display: "block", newType: ""})
+        this.setState({display: "block"})
     }
 
     handleCloseModal() {
-        this.setState({display: "none", newType: ""})
-    }
-
-    handleTypeNameChange(event) {
-        this.setState({newType: event.target.value});
-    }
-
-    handleSaveNewType() {
-        const data = {
-            type: this.state.newType
-        }
-
-        axios.post(`http://localhost/wine-shop-api/wine-types`, data)
-        .then(() => {
-            this.getTypes();
-            toast.success("Cadastrado tipo de vinho: " + this.state.newType);
-
-            this.setState({newType: ""});
-        })
-        .catch(error => {
-            console.log(error);
-            toast.error("Ocorreu um erro de comunicação com o servidor");
-        });
+        this.setState({display: "none"})
+        this.getTypes();
     }
 
     handleAddWine() {
@@ -208,29 +185,7 @@ class RegisterWine extends Component {
                     <button className="green btn" style={{width:200}} onClick={this.handleAddWine}>Adicionar Vinho</button>
                 </div>
 
-                <div id="myModal" className="modal" style={{display: this.state.display}}>
-                    <div className="modal-content card register-container">
-                        <div className="modal-header">
-                            <h3>Cadastrar de tipo de vinho</h3>
-                            <span className="close" onClick={this.handleCloseModal}>&times;</span>
-                        </div>
-                        <div className="register-container">
-                            <div className="grid-item">
-                                <div className="field">
-                                    tipo de vinho:
-                                </div>
-                                <div className="value">
-                                    <input type="text"
-                                        className="input value-field"
-                                        value={this.state.newType}
-                                        onChange={this.handleTypeNameChange}
-                                    />
-                                </div>
-                            </div>
-                            <button className="green btn" style={{width:200}} onClick={this.handleSaveNewType}>Cadastrar Tipo</button>
-                        </div>
-                    </div>
-                </div>
+                <ModalWineType closeModal={this.handleCloseModal} display={this.state.display}/>
             </div>
         );
     }
